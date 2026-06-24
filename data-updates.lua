@@ -57,6 +57,12 @@ local mults = {}
 for i = 0, maxDepth, 1 do
     mults[i] = initialMultiplier*math.pow(finalMultiplier/initialMultiplier, i/maxDepth)
 end
+
+function findLast(haystack, needle)
+    local i=haystack:match(".*"..needle.."()")
+    if i==nil then return nil else return i-1 end
+end
+
 for techName, depth in pairs(depthTable) do
     depth = math.min(depth, maxDepth)
     local tech = data.raw["technology"][techName]
@@ -66,7 +72,29 @@ for techName, depth in pairs(depthTable) do
             tech.unit.count = math.ceil(tech.unit.count*mult)
             log(string.format("%s: %d", tech.name, tech.unit.count))
         else
-            tech.unit.count_formula = string.format("%d*(%s)", mult, tech.unit.count_formula)
+            local dashIndex = findLast(techName, "-")
+            local infiniteTechStartingLevel
+            if dashIndex == nil then
+                infiniteTechStartingLevel = 1
+            else
+                local suffix = string.sub(techName, dashIndex + 1)
+                log(string.format("%s: %d = %s", techName, dashIndex, suffix))
+                infiniteTechStartingLevel = tonumber(suffix)
+                if infiniteTechStartingLevel == nil then
+                    infiniteTechStartingLevel = 1
+                end
+            end
+            log(string.format("%s: %d", techName, infiniteTechStartingLevel))
+            tech.unit.count_formula = string.format(
+                "(%d*(%d/%d)^min(1,(%d+L-%d)/%d))*(%s)",
+                initialMultiplier,
+                finalMultiplier,
+                initialMultiplier,
+                depth,
+                infiniteTechStartingLevel,
+                maxDepth,
+                tech.unit.count_formula)
+            -- tech.unit.count_formula = string.format("%d*(%s)", mult, tech.unit.count_formula)
         end
     end
 end
