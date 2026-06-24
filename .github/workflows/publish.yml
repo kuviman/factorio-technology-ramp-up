@@ -1,0 +1,15 @@
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+name: Publish to the Factorio mod portal
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Publish mod
+      uses: Penguin-Spy/factorio-mod-portal-publish@main
+      with:
+        factorio-api-key: ${{ secrets.FACTORIO_API_KEY }}
