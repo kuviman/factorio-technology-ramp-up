@@ -2,7 +2,7 @@ local constants = require("constants")
 
 local defaultFinal = "rocket-silo"
 if mods["space-age"] then
-    defaultFinal = "promethium-science-pack"
+    defaultFinal = "stellar-discovery-solar-system-edge"
 end
 
 data:extend{

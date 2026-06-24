@@ -1,8 +1,8 @@
 {
     "name": "technology-ramp-up-fixed",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "title": "Technology Cost Ramp Up Fixed",
-    "author": "<TEMPLATE AUTHOR>",
+    "author": "kuviboy",
     "factorio_version": "2.1",
     "dependencies": [],
     "description": "Applies a technology cost multiplier that steadily increases as you get deeper in the tech tree, instead of a flat multiplier applied to all technologies equally."
