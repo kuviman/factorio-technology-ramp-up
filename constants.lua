@@ -10,7 +10,8 @@ local exports = {
         initialMultiplier = makeID("initial-multiplier"),
         finalMultiplier = makeID("final-multiplier"),
         finalTechnology = makeID("final-technology"),
-        skipInitialTriggerTechs = makeID("skip-initial-triggers")
+        skipInitialTriggerTechs = makeID("skip-initial-triggers"),
+        goBeyondFinalMultiplier = makeID("go-beyond-final-multiplier"),
     }
 }
 

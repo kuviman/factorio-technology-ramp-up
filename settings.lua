@@ -37,5 +37,12 @@ data:extend{
         setting_type = "startup",
         default_value = true,
         order = "d"
-    }
+    },
+    {
+        type = "bool-setting",
+        name = constants.settings.goBeyondFinalMultiplier,
+        setting_type = "startup",
+        default_value = false,
+        order = "e"
+    },
 }

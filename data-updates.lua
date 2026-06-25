@@ -13,6 +13,7 @@ local initialMultiplier = settings.startup[constants.settings.initialMultiplier]
 local finalMultiplier = settings.startup[constants.settings.finalMultiplier].value
 local finalTech = settings.startup[constants.settings.finalTechnology].value
 local skipInitialTriggerTechs = settings.startup[constants.settings.skipInitialTriggerTechs].value
+local goBeyondFinalMultiplier = settings.startup[constants.settings.goBeyondFinalMultiplier].value
 if finalTech ~= "" and not data.raw["technology"][finalTech] then
     error(string.format("Final technology '%s' does not exist.", finalTech))
 end
@@ -53,9 +54,13 @@ if finalTech ~= "" then
         error(string.format("Final technology '%s' cannot be a starting technology (must have at least 1 prerequisite technology)!", finalTech))
     end
 end
-local mults = {}
-for i = 0, maxDepth, 1 do
-    mults[i] = initialMultiplier*math.pow(finalMultiplier/initialMultiplier, i/maxDepth)
+
+function multiplierForDepth(depth)
+    local k = depth/maxDepth
+    if not goBeyondFinalMultiplier then
+        k = math.min(k, 1)
+    end
+    return initialMultiplier*math.pow(finalMultiplier/initialMultiplier, k)
 end
 
 function findLast(haystack, needle)
@@ -64,10 +69,9 @@ function findLast(haystack, needle)
 end
 
 for techName, depth in pairs(depthTable) do
-    depth = math.min(depth, maxDepth)
     local tech = data.raw["technology"][techName]
     if tech.unit then
-        local mult = mults[depth]
+        local mult = multiplierForDepth(depth)
         if tech.unit.count then
             tech.unit.count = math.ceil(tech.unit.count*mult)
             log(string.format("%s: %d", tech.name, tech.unit.count))
@@ -85,16 +89,22 @@ for techName, depth in pairs(depthTable) do
                 end
             end
             log(string.format("%s: %d", techName, infiniteTechStartingLevel))
+            local k = string.format(
+                "((%d+L-%d)/%d))",
+                depth,
+                infiniteTechStartingLevel,
+                maxDepth
+            )
+            if not goBeyondFinalMultiplier then
+                k = string.format("min(1, %s)", k)
+            end
             tech.unit.count_formula = string.format(
-                "(%d*(%d/%d)^min(1,(%d+L-%d)/%d))*(%s)",
+                "(%d*(%d/%d)^%s*(%s)",
                 initialMultiplier,
                 finalMultiplier,
                 initialMultiplier,
-                depth,
-                infiniteTechStartingLevel,
-                maxDepth,
+                k,
                 tech.unit.count_formula)
-            -- tech.unit.count_formula = string.format("%d*(%s)", mult, tech.unit.count_formula)
         end
     end
 end
